@@ -1,5 +1,5 @@
 // Contact form: sends through Web3Forms without exposing the inbox address
-document.querySelectorAll('#contact-form, #page-request-form').forEach(function (form) {
+document.querySelectorAll('#contact-form').forEach(function (form) {
   var status = form.querySelector('.form-status');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
