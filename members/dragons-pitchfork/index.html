@@ -23,9 +23,10 @@
 <nav class="nav" aria-label="Main">
 <a href="../../members/" aria-current="page">Members</a>
 <a href="../../index.html#music">Music</a>
+<a href="../../cinematics/">Cinematics</a>
 <a href="../../house-of-traps/">House of Traps</a>
 <a href="../../20-bags-of-gold/">20 Bags of Gold</a>
-<a href="../../index.html#temple">The Temple</a>
+<a href="../../contact/">Contact</a>
 </nav>
 <a class="btn btn-ink" href="../../index.html#list">Join the list</a>
 </div>
@@ -99,7 +100,7 @@
 <span class="coin" style="width:64px;height:64px"><img src="../../assets/img/begga-face-sm.png" alt="" style="width:52px;height:52px"></span>
 <div>
 <div style="font-family:var(--display);font-size:28px">THA BEGGAS</div>
-<div class="mono" style="font-size:13px">Booking and media: <a href="mailto:thebeggaz@thebeggaz.com">email us</a></div>
+<div class="mono" style="font-size:13px">Booking and media: <a href="../../contact/">send a message</a></div>
 </div>
 </div>
 <nav aria-label="Social">
@@ -112,6 +113,20 @@
 </nav>
 </div>
 </footer>
+<dialog class="popup" id="scroll-popup" aria-labelledby="popup-h">
+<button class="popup-x" type="button" aria-label="Close" data-close>&times;</button>
+<p class="kicker" style="font-size:13px">Temple Scrolls</p>
+<h2 id="popup-h" class="h-m">Join the list</h2>
+<p>New music, new chapters in the House of Traps and new pieces in 20 Bags of Gold. Straight to your inbox.</p>
+<!-- Mailchimp: replace MAILCHIMP_ACTION_URL with the form action from Audience > Signup forms > Embedded form -->
+<form class="signup" action="MAILCHIMP_ACTION_URL" method="post" target="_blank" novalidate data-mc>
+<div><label for="popup-email">Email</label><input id="popup-email" name="EMAIL" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+<div aria-hidden="true" style="position:absolute;left:-5000px"><input type="text" name="MAILCHIMP_HONEYPOT_NAME" tabindex="-1" value=""></div>
+<input type="hidden" name="tags" value="MAILCHIMP_TAG_ID_SITE">
+<button class="btn btn-ink" type="submit">Subscribe</button>
+</form>
+</dialog>
+<script src="../../assets/js/main.js"></script>
 
 </body>
 </html>
