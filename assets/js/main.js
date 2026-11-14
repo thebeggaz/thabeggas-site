@@ -23,6 +23,39 @@
 
   dlg.querySelector('[data-close]').addEventListener('click', function () { dlg.close(); });
   dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-  var form = dlg.querySelector('form');
-  if (form) form.addEventListener('submit', function () { setTimeout(function () { dlg.close(); }, 300); });
+})();
+
+// Mailchimp signups: submit in place (JSONP) instead of opening a new tab
+(function () {
+  var n = 0;
+  document.querySelectorAll('form[data-mc]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var status = form.querySelector('.form-status');
+      var email = form.querySelector('input[name="EMAIL"]');
+      if (!email.value || !email.checkValidity()) { status.textContent = 'Enter a valid email.'; email.focus(); return; }
+      var cb = 'tbMc' + (++n) + Date.now();
+      var params = new URLSearchParams(new FormData(form)).toString();
+      var url = form.action.replace('/post?', '/post-json?') + '&' + params + '&c=' + cb;
+      var s = document.createElement('script');
+      var done = false;
+      window[cb] = function (r) {
+        done = true;
+        if (r && r.result === 'success') {
+          form.reset();
+          status.textContent = 'You are on the list. Check your inbox.';
+          var dlg = form.closest('dialog');
+          if (dlg) setTimeout(function () { dlg.close(); }, 1600);
+        } else {
+          var msg = (r && r.msg) ? String(r.msg).replace(/<[^>]*>/g, '') : '';
+          status.textContent = /already subscribed/i.test(msg) ? 'You are already on the list.' : 'That did not go through. Check the email and try again.';
+        }
+        delete window[cb]; s.remove();
+      };
+      s.src = url;
+      s.onerror = function () { if (!done) { status.textContent = 'That did not go through. Try again in a minute.'; } };
+      status.textContent = 'Sending...';
+      document.body.appendChild(s);
+    });
+  });
 })();
