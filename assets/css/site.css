@@ -257,3 +257,9 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .img-status.bad { color: #B3261E; }
 .img-status.good { color: #2E6B2E; }
 .price-list { margin: 8px 0 0; }
+.link-status { margin: 6px 0 0; font-size: 14px; }
+.link-status.bad { color: #B3261E; }
+.link-status.good { color: #2E6B2E; }
+.link-status:empty, .img-status:empty { display: none; }
+.clear-file { background: none; border: 0; padding: 0; cursor: pointer; font-size: 13px; }
+.test-banner { margin: 0; background: var(--gold); color: var(--ink); font-family: var(--mono); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; padding: 10px 14px; }
