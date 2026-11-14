@@ -216,3 +216,6 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .mc-success { display: flex; align-items: center; gap: 18px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); padding: 16px 22px; }
 .mc-success img { width: 88px; height: auto; }
 .mc-success p { font-family: var(--display); font-size: 30px; line-height: 1.05; margin: 0; }
+.g5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 960px) { .g5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.g5 > * { min-width: 0; }
