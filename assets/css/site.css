@@ -192,3 +192,6 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .popup-x { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; background: transparent; font-size: 32px; line-height: 1; cursor: pointer; color: var(--ink); }
 .popup .signup input, .dark .popup .signup input { background: var(--card); color: var(--ink); border-color: var(--ink); }
 .dark .popup .btn-ink { color: var(--paper); }
+.gry-link { display: flex; align-items: center; gap: 16px; text-decoration: none; border: 3px solid var(--ink); background: var(--card); padding: 12px 16px; align-self: flex-start; }
+.gry-link img { width: 64px; height: auto; }
+.gry-link:hover { box-shadow: 6px 6px 0 var(--gold); color: var(--ink); }
