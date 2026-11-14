@@ -83,10 +83,32 @@
   });
 
   // ---- Submit
-  function send(withFiles) {
-    var fd = new FormData(form);
-    if (withFiles) Object.keys(files).forEach(function (k) { fd.append('attachment', files[k], k.replace(/\W+/g, '-') + '.png'); });
-    return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(function (r) { return r.json(); });
+  // Images go to the Google Apps Script web app (saves to Drive). Paste its /exec URL here.
+  var UPLOAD_URL = '';
+  var UPLOAD_TOKEN = 'begga-temple-scrolls';
+  function send() {
+    return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) }).then(function (r) { return r.json(); });
+  }
+  function b64(file) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onload = function () { res(String(fr.result).split(',')[1]); };
+      fr.onerror = rej; fr.readAsDataURL(file);
+    });
+  }
+  function upload() {
+    var keys = Object.keys(files);
+    if (!keys.length) return Promise.resolve(true);
+    if (!UPLOAD_URL) return Promise.resolve(false);
+    return Promise.all(keys.map(function (k) { return b64(files[k]).then(function (d) { return { label: k, type: 'image/png', data: d }; }); }))
+      .then(function (images) {
+        return fetch(UPLOAD_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({
+          token: UPLOAD_TOKEN, begga: form.querySelector('#r-begga').value, name: form.querySelector('#r-name').value,
+          email: form.querySelector('#r-email').value, images: images }) });
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { return !!d.success; })
+      .catch(function () { return false; });
   }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -100,19 +122,16 @@
     if (!form.checkValidity()) { form.reportValidity(); return; }
     var btn = form.querySelector('button[type="submit"]');
     btn.disabled = true; status.textContent = 'Sending...';
-    var hasFiles = Object.keys(files).length > 0;
-    send(hasFiles)
+    send()
       .then(function (d) {
-        if (d.success) return { ok: true, files: hasFiles };
-        if (hasFiles) return send(false).then(function (d2) { return { ok: d2.success, files: false, dropped: true }; });
-        return { ok: false };
-      })
-      .then(function (r) {
-        if (!r.ok) { status.textContent = 'That did not go through. Try again in a minute.'; return; }
-        status.textContent = r.dropped
-          ? 'Received. Your images did not come through, so we will reach out to get them from you.'
-          : "Received. We'll reach out to start building your page.";
-        status.scrollIntoView({ block: 'center' });
+        if (!d.success) { status.textContent = 'That did not go through. Try again in a minute.'; return; }
+        status.textContent = 'Sending your images...';
+        return upload().then(function (ok) {
+          status.textContent = ok
+            ? "Received. We'll reach out to start building your page."
+            : 'Received. Your images did not come through, so we will reach out to get them from you.';
+          status.scrollIntoView({ block: 'center' });
+        });
       })
       .catch(function () { status.textContent = 'That did not go through. Try again in a minute.'; })
       .then(function () { btn.disabled = false; });
