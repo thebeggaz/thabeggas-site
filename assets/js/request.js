@@ -177,9 +177,10 @@
     errBox.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function send() {
+  function send(imageNotes) {
     var fd = new FormData(form);
     form.querySelectorAll('input[type=file]').forEach(function (i) { fd.delete(i.name); });
+    if (imageNotes) fd.append('Images', imageNotes);
     return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(function (r) { return r.json(); });
   }
   function b64(file) {
@@ -197,11 +198,12 @@
   // One image per request, so big covers don't hit size limits
   function uploadAll() {
     var items = Object.keys(files).map(function (k) { return files[k]; });
-    var failed = [], i = 0;
-    if (!items.length) return Promise.resolve(failed);
-    if (!UPLOAD_URL) return Promise.resolve(items.map(function (it) { return nameFor(it) + ': uploads are not set up yet.'; }));
+    var failed = [], links = [], folder = '', i = 0;
+    function done() { return { failed: failed, links: links, folder: folder }; }
+    if (!items.length) return Promise.resolve(done());
+    if (!UPLOAD_URL) { failed = items.map(function (it) { return nameFor(it) + ': uploads are not set up yet.'; }); return Promise.resolve(done()); }
     function next() {
-      if (i >= items.length) return Promise.resolve(failed);
+      if (i >= items.length) return Promise.resolve(done());
       var it = items[i++], label = nameFor(it);
       status.innerHTML = '<p>Sending image ' + i + ' of ' + items.length + ' (' + esc(label) + ')...</p>';
       return b64(it.file)
@@ -212,6 +214,8 @@
         })
         .then(function (r) { return r.json(); })
         .then(function (d) {
+          (d.links || []).forEach(function (l) { links.push(l.label + ': ' + l.url); });
+          if (d.folder) folder = d.folder;
           if (!d.success) failed.push(label + ': ' + ((d.rejected && d.rejected.length) ? d.rejected.join('; ').replace(/^[^:]*:\s*/, '') : (d.message || 'the upload was refused.')));
         })
         .catch(function () { failed.push(label + ': we couldn\'t reach the upload service.'); })
@@ -242,23 +246,29 @@
     showErrors([]);
     var btn = form.querySelector('button[type="submit"]');
     btn.disabled = true; status.innerHTML = '<p>Sending...</p>';
-    send()
-      .then(function (d) {
-        if (!d.success) {
+    uploadAll()
+      .then(function (up) {
+        var notes = [];
+        if (up.links.length) notes.push(up.links.join('\n'));
+        if (up.folder) notes.push('Folder: ' + up.folder);
+        if (up.failed.length) notes.push('Did not upload:\n' + up.failed.join('\n'));
+        status.innerHTML = '<p>Sending your answers...</p>';
+        return send(notes.join('\n\n')).then(function (d) { return { d: d, up: up }; });
+      })
+      .then(function (r) {
+        if (!r.d.success) {
           status.innerHTML = '';
-          showErrors(['Your answers did not send. Wait a minute and press Send my page again.' + (d.message ? ' (' + esc(d.message) + ')' : '')], 'Nothing was sent.');
+          showErrors(['Your answers did not send. Wait a minute and press Send my page again.' + (r.d.message ? ' (' + esc(r.d.message) + ')' : '')], 'Nothing was sent.');
           return;
         }
-        return uploadAll().then(function (failed) {
-          if (failed.length) {
-            status.innerHTML = '<p class="ok">Your answers were sent.</p>';
-            showErrors(failed.map(esc).concat(['Your answers still went through. Fix the images above and send the form again, or we will reach out to get them.']),
-              'Some images did not go through:');
-          } else {
-            status.innerHTML = '<p class="ok">Received. We\'ll reach out to start building your page.</p>';
-            status.scrollIntoView({ block: 'center' });
-          }
-        });
+        if (r.up.failed.length) {
+          status.innerHTML = '<p class="ok">Your answers were sent.</p>';
+          showErrors(r.up.failed.map(esc).concat(['Your answers still went through. Fix the images above and send the form again, or we will reach out to get them.']),
+            'Some images did not go through:');
+        } else {
+          status.innerHTML = '<p class="ok">Received. We\'ll reach out to start building your page.</p>';
+          status.scrollIntoView({ block: 'center' });
+        }
       })
       .catch(function () {
         status.innerHTML = '';
