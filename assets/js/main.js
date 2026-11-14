@@ -43,7 +43,15 @@
         done = true;
         if (r && r.result === 'success') {
           form.reset();
-          status.textContent = 'You are on the list. Check your inbox.';
+          var ok = document.createElement('div');
+          ok.className = 'mc-success';
+          ok.setAttribute('role', 'status');
+          var img = document.createElement('img');
+          img.src = form.getAttribute('data-temple'); img.alt = '';
+          var t = document.createElement('p');
+          t.textContent = 'Welcome to The Temple';
+          ok.appendChild(img); ok.appendChild(t);
+          form.replaceWith(ok);
           var dlg = form.closest('dialog');
           if (dlg) setTimeout(function () { dlg.close(); }, 1600);
         } else {
