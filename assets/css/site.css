@@ -200,3 +200,16 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .coin-card .coin-title { font-family: var(--display); font-size: 34px; line-height: 1.05; display: block; }
 .coin-card:hover { border-color: var(--gold); color: var(--paper); }
 .video .frame.short { aspect-ratio: 9 / 16; max-height: 640px; margin: 0 auto; }
+
+/* Cabinet art */
+.cab .screen { position: relative; overflow: hidden; gap: 0; }
+.cab .screen .n { position: absolute; left: 16px; bottom: 10px; font-size: 72px; text-shadow: 0 3px 0 #000; z-index: 2; }
+.marquee { position: absolute; top: 0; left: 0; right: 0; z-index: 2; background: var(--gold); color: var(--ink); font-family: var(--display); font-size: 22px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 8px 10px; border-bottom: 3px solid #000; }
+.art-ch1 { background: radial-gradient(circle at 50% 52%, #3a2a08 0%, #141414 62%); }
+.screen-coin { width: 70%; height: auto; filter: drop-shadow(0 0 28px rgba(232,176,48,0.45)); }
+.art-img .screen-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.art-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0) 40%); z-index: 1; }
+.art-locked { background: #141414; }
+.screen-temple { width: 72%; height: auto; opacity: 0.18; filter: grayscale(1) brightness(2.2); }
+.locked { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--mono); font-weight: 700; font-size: 15px; letter-spacing: 3px; text-transform: uppercase; color: var(--paper); border: 2px solid var(--paper); padding: 10px 16px; background: rgba(0,0,0,0.6); }
+.cab .screen::before, .screen-ph.art-ch1::before { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 4px); }
