@@ -93,8 +93,8 @@
         (f[1] === 'link' ? ' inputmode="url" autocomplete="off" data-link="' + f[3] + '"' : '') +
         (f[4] === 'title' ? ' data-title' : '') + (f[4] === 'video' ? ' data-video' : '') + '>';
       var block = '<div class="field"><label for="' + id + '">' + lab + '</label>' + inp + (f[1] === 'link' ? '<p class="link-status" aria-live="polite"></p>' : '') + '</div>';
-      if (f[1] === 'cover') block = '<div class="field img-field"><label for="' + id + '">' + lab + '</label><p class="hint">PNG or JPG, at least 3000 x 3000 pixels, under 15 MB.</p>' +
-        '<div class="row" style="gap:12px;flex-wrap:wrap;align-items:center"><input id="' + id + '" type="file" accept="image/png,image/jpeg" data-img="cover" data-w="3000" data-h="3000" data-types="png,jpg" data-label="Cover art">' +
+      if (f[1] === 'cover') block = '<div class="field img-field"><label for="' + id + '">' + lab + '</label><p class="hint">PNG only, at least 1500 x 1500 pixels, under 15 MB.</p>' +
+        '<div class="row" style="gap:12px;flex-wrap:wrap;align-items:center"><input id="' + id + '" type="file" accept="image/png" data-img="cover" data-w="1500" data-h="1500" data-types="png" data-label="Cover art">' +
         '<button type="button" class="link-mono clear-file">Clear</button></div><p class="img-status" aria-live="polite"></p></div>';
       if (f[0] === 'Performed by' || f[0] === 'Produced by') { pair.push(block); if (pair.length === 2) { html += '<div class="g2" style="gap:18px">' + pair.join('') + '</div>'; pair = []; } }
       else html += block;
