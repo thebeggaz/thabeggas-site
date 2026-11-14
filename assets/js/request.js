@@ -71,7 +71,7 @@
   var CREDITS = [['Performed by', 'text', true], ['Produced by', 'text', true]];
   var GROUPS = {
     'Other link': { noun: 'link', fields: [['What it is', 'text', true, null, 'title'], ['Link', 'link', true, 'any']] },
-    'Selected work': { noun: 'song', start: 1, fields: [['Title', 'text', true, null, 'title'], ['Song link', 'link', false, 'any']].concat(CREDITS, [['Mixed and mastered by', 'text', false]]) },
+    'Selected work': { noun: 'song', start: 1, fields: [['Title', 'text', true, null, 'title'], ['Song link', 'link', false, 'any']].concat(CREDITS, [['Mixed and mastered by', 'text', false], ['Cover art', 'cover', false]]) },
     'Executive production': { noun: 'release', fields: [['Title', 'text', true, null, 'title'], ['Link', 'link', false, 'any']].concat(CREDITS, [['Mixed and mastered by', 'text', false]]) },
     'Projects': { noun: 'project', fields: [['Title', 'text', true, null, 'title'], ['Link', 'link', false, 'any']].concat(CREDITS, [['Mixed and mastered by', 'text', false]]) },
     'Music visual': { noun: 'video', fields: [['Title', 'text', true, null, 'title'], ['YouTube link', 'link', true, 'youtube', 'video'], ['Prod by', 'text', false], ['Video by', 'text', false]] },
@@ -93,6 +93,9 @@
         (f[1] === 'link' ? ' inputmode="url" autocomplete="off" data-link="' + f[3] + '"' : '') +
         (f[4] === 'title' ? ' data-title' : '') + (f[4] === 'video' ? ' data-video' : '') + '>';
       var block = '<div class="field"><label for="' + id + '">' + lab + '</label>' + inp + (f[1] === 'link' ? '<p class="link-status" aria-live="polite"></p>' : '') + '</div>';
+      if (f[1] === 'cover') block = '<div class="field img-field"><label for="' + id + '">' + lab + '</label><p class="hint">PNG or JPG, at least 3000 x 3000 pixels, under 15 MB.</p>' +
+        '<div class="row" style="gap:12px;flex-wrap:wrap;align-items:center"><input id="' + id + '" type="file" accept="image/png,image/jpeg" data-img="cover" data-w="3000" data-h="3000" data-types="png,jpg" data-label="Cover art">' +
+        '<button type="button" class="link-mono clear-file">Clear</button></div><p class="img-status" aria-live="polite"></p></div>';
       if (f[0] === 'Performed by' || f[0] === 'Produced by') { pair.push(block); if (pair.length === 2) { html += '<div class="g2" style="gap:18px">' + pair.join('') + '</div>'; pair = []; } }
       else html += block;
     });
@@ -100,7 +103,11 @@
     row.innerHTML = html;
     set.querySelector('.work-rows').appendChild(row);
     row.querySelectorAll('[data-link]').forEach(wireLink);
-    row.querySelector('.remove-row').addEventListener('click', function () { row.remove(); });
+    row.querySelectorAll('input[type=file][data-img]').forEach(wireImage);
+    row.querySelector('.remove-row').addEventListener('click', function () {
+      row.querySelectorAll('input[type=file]').forEach(function (i) { delete files[i.id]; });
+      row.remove();
+    });
   }
   form.querySelectorAll('[data-group]').forEach(function (set) {
     set.querySelector('.add-row').addEventListener('click', function () { addRow(set); });
@@ -122,44 +129,58 @@
   }
   [game, pat, cov].forEach(function (el) { el.addEventListener('change', cost); });
 
-  // ---- Image checks: PNG, transparent, minimum size
-  form.querySelectorAll('input[type=file][data-img]').forEach(function (input) {
-    var st = input.closest('.field').querySelector('.img-status');
-    var label = input.getAttribute('data-img');
-    function reset() { delete files[label]; input.setCustomValidity(''); st.textContent = ''; st.className = 'img-status'; }
-    form.querySelector('.clear-file[data-for="' + input.id + '"]').addEventListener('click', function () { input.value = ''; reset(); });
+  // ---- Image checks: type, minimum size, file size
+  var MAX_MB = 15;
+  function wireImage(input) {
+    var field = input.closest('.field'), st = field.querySelector('.img-status');
+    function reset() { delete files[input.id]; input.setCustomValidity(''); st.textContent = ''; st.className = 'img-status'; }
+    field.querySelector('.clear-file').addEventListener('click', function () { input.value = ''; reset(); });
     input.addEventListener('change', function () {
       reset();
       var file = input.files[0];
       if (!file) return;
+      var types = (input.getAttribute('data-types') || 'png').split(',');
+      var isPng = file.type === 'image/png' || /\.png$/i.test(file.name);
+      var isJpg = file.type === 'image/jpeg' || /\.jpe?g$/i.test(file.name);
       function bad(msg) { input.setCustomValidity(msg); st.textContent = msg; st.className = 'img-status bad'; }
-      if (file.type !== 'image/png' && !/\.png$/i.test(file.name)) return bad('That file is not a PNG.');
-      if (file.size > 5 * 1024 * 1024) return bad('That file is over 5 MB.');
+      if (!(isPng && types.indexOf('png') > -1) && !(isJpg && types.indexOf('jpg') > -1)) {
+        return bad('This file can\'t be used. It has to be a ' + (types.length > 1 ? 'PNG or JPG' : 'PNG') + ' image.');
+      }
+      if (file.size > MAX_MB * 1024 * 1024) return bad('This image is too big (' + (file.size / 1048576).toFixed(1) + ' MB). It has to be under ' + MAX_MB + ' MB.');
       var url = URL.createObjectURL(file), img = new Image();
       img.onload = function () {
-        var w = +input.getAttribute('data-w'), h = +input.getAttribute('data-h');
-        var iw = img.naturalWidth, ih = img.naturalHeight;
-        if (iw < w || ih < h) {
-          URL.revokeObjectURL(url);
-          return bad('Your image is ' + iw + ' x ' + ih + '. It needs to be at least ' + (h ? w + ' x ' + h : w + ' pixels wide') + '.');
-        }
-        var c = document.createElement('canvas'); c.width = iw; c.height = ih;
-        var ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
-        var data = ctx.getImageData(0, 0, iw, ih).data, clear = false;
-        for (var i = 3; i < data.length; i += 4) { if (data[i] < 250) { clear = true; break; } }
+        var w = +input.getAttribute('data-w'), h = +input.getAttribute('data-h'), iw = img.naturalWidth, ih = img.naturalHeight;
         URL.revokeObjectURL(url);
-        if (!clear) return bad('This PNG has no transparent background. Remove the background and try again.');
-        files[label] = file;
-        st.textContent = 'Looks good: ' + iw + ' x ' + ih + ', transparent PNG.'; st.className = 'img-status good';
+        if (iw < w || ih < h) return bad('This image is too small. It\'s ' + iw + ' x ' + ih + ' pixels and needs to be at least ' + (h ? w + ' x ' + h : w + ' pixels wide') + '.');
+        files[input.id] = { file: file, kind: input.getAttribute('data-img'), input: input };
+        st.textContent = 'Looks good: ' + iw + ' x ' + ih + ' pixels.'; st.className = 'img-status good';
       };
-      img.onerror = function () { URL.revokeObjectURL(url); bad('That image could not be read.'); };
+      img.onerror = function () { URL.revokeObjectURL(url); bad('This image couldn\'t be opened. Try saving it again as a ' + (types.length > 1 ? 'PNG or JPG' : 'PNG') + '.'); };
       img.src = url;
     });
-  });
+  }
+  form.querySelectorAll('input[type=file][data-img]').forEach(wireImage);
 
   // ---- Submit
+  var errBox = form.querySelector('#form-errors');
+  function labelFor(el) {
+    var f = el.closest('.field'), l = f && f.querySelector('label, .label');
+    var row = el.closest('.work-row'), rl = row && row.querySelector('.kicker');
+    if (el.name === 'Permission') return 'The permission box at the bottom';
+    var t = l ? l.textContent.replace(/\s*\(optional\)/i, '') : (el.name || 'A field');
+    return (rl ? rl.textContent + ', ' : '') + t;
+  }
+  function showErrors(list, title) {
+    if (!list.length) { errBox.hidden = true; errBox.innerHTML = ''; return; }
+    errBox.innerHTML = '<p class="err-title">' + title + '</p><ul>' + list.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
+    errBox.hidden = false;
+    errBox.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function send() {
-    return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) }).then(function (r) { return r.json(); });
+    var fd = new FormData(form);
+    form.querySelectorAll('input[type=file]').forEach(function (i) { fd.delete(i.name); });
+    return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(function (r) { return r.json(); });
   }
   function b64(file) {
     return new Promise(function (res, rej) {
@@ -168,50 +189,81 @@
       fr.onerror = rej; fr.readAsDataURL(file);
     });
   }
-  function upload() {
-    var keys = Object.keys(files);
-    if (!keys.length) return Promise.resolve(true);
-    if (!UPLOAD_URL) return Promise.resolve(false);
-    return Promise.all(keys.map(function (k) { return b64(files[k]).then(function (d) { return { label: k, type: 'image/png', data: d }; }); }))
-      .then(function (images) {
-        return fetch(UPLOAD_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({
-          token: UPLOAD_TOKEN, test: TEST, begga: form.querySelector('#r-begga').value, name: form.querySelector('#r-name').value,
-          email: form.querySelector('#r-email').value, images: images }) });
-      })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { return !!d.success; })
-      .catch(function () { return false; });
+  function nameFor(item) {
+    if (item.kind !== 'cover') return item.input.getAttribute('data-label');
+    var row = item.input.closest('.work-row'), t = row && row.querySelector('[data-title]');
+    return 'Cover art - ' + ((t && t.value.trim()) || (row ? row.querySelector('.kicker').textContent : 'song'));
+  }
+  // One image per request, so big covers don't hit size limits
+  function uploadAll() {
+    var items = Object.keys(files).map(function (k) { return files[k]; });
+    var failed = [], i = 0;
+    if (!items.length) return Promise.resolve(failed);
+    if (!UPLOAD_URL) return Promise.resolve(items.map(function (it) { return nameFor(it) + ': uploads are not set up yet.'; }));
+    function next() {
+      if (i >= items.length) return Promise.resolve(failed);
+      var it = items[i++], label = nameFor(it);
+      status.innerHTML = '<p>Sending image ' + i + ' of ' + items.length + ' (' + esc(label) + ')...</p>';
+      return b64(it.file)
+        .then(function (d) {
+          return fetch(UPLOAD_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({
+            token: UPLOAD_TOKEN, test: TEST, begga: form.querySelector('#r-begga').value, name: form.querySelector('#r-name').value,
+            email: form.querySelector('#r-email').value, images: [{ label: label, kind: it.kind, type: it.file.type || (/\.png$/i.test(it.file.name) ? 'image/png' : 'image/jpeg'), data: d }] }) });
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d.success) failed.push(label + ': ' + ((d.rejected && d.rejected.length) ? d.rejected.join('; ').replace(/^[^:]*:\s*/, '') : (d.message || 'the upload was refused.')));
+        })
+        .catch(function () { failed.push(label + ': we couldn\'t reach the upload service.'); })
+        .then(next);
+    }
+    return next();
   }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    status.innerHTML = '';
     var roles = [].map.call(form.querySelectorAll('.role:checked'), function (c) { return c.value; });
     form.querySelector('#r-roles').value = roles.join(', ');
     form.querySelectorAll('[data-link]').forEach(checkLink);
     form.querySelectorAll('.work-row').forEach(function (row) {
-      var used = [].some.call(row.querySelectorAll('input'), function (i) { return i.value.trim(); });
+      var used = [].some.call(row.querySelectorAll('input:not([type=file])'), function (i) { return i.value.trim(); });
       row.querySelectorAll('[data-rowreq]').forEach(function (i) { i.required = used; });
     });
     if (TEST) form.querySelectorAll('[required]').forEach(function (i) { i.required = false; });
     cost();
-    if (!form.checkValidity()) {
-      var first = form.querySelector(':invalid');
-      form.reportValidity(); if (first) first.focus();
+    var bad = [].slice.call(form.querySelectorAll(':invalid')).filter(function (el) { return el.tagName !== 'FORM' && el.tagName !== 'FIELDSET'; });
+    if (bad.length) {
+      showErrors(bad.map(function (el) {
+        var why = el.validity.valueMissing ? 'This is required.' : (el.validationMessage || 'Check this field.');
+        return '<strong>' + esc(labelFor(el)) + ':</strong> ' + esc(why);
+      }), 'Fix ' + (bad.length === 1 ? 'this' : 'these ' + bad.length + ' things') + ' before sending:');
       return;
     }
+    showErrors([]);
     var btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true; status.textContent = 'Sending...';
+    btn.disabled = true; status.innerHTML = '<p>Sending...</p>';
     send()
       .then(function (d) {
-        if (!d.success) { status.textContent = 'That did not go through. Try again in a minute.'; return; }
-        status.textContent = 'Sending your images...';
-        return upload().then(function (ok) {
-          status.textContent = ok
-            ? "Received. We'll reach out to start building your page."
-            : 'Received. Your images did not come through, so we will reach out to get them from you.';
-          status.scrollIntoView({ block: 'center' });
+        if (!d.success) {
+          status.innerHTML = '';
+          showErrors(['Your answers did not send. Wait a minute and press Send my page again.' + (d.message ? ' (' + esc(d.message) + ')' : '')], 'Nothing was sent.');
+          return;
+        }
+        return uploadAll().then(function (failed) {
+          if (failed.length) {
+            status.innerHTML = '<p class="ok">Your answers were sent.</p>';
+            showErrors(failed.map(esc).concat(['Your answers still went through. Fix the images above and send the form again, or we will reach out to get them.']),
+              'Some images did not go through:');
+          } else {
+            status.innerHTML = '<p class="ok">Received. We\'ll reach out to start building your page.</p>';
+            status.scrollIntoView({ block: 'center' });
+          }
         });
       })
-      .catch(function () { status.textContent = 'That did not go through. Try again in a minute.'; })
+      .catch(function () {
+        status.innerHTML = '';
+        showErrors(['We could not reach the form service. Check your connection, wait a minute and press Send my page again.'], 'Nothing was sent.');
+      })
       .then(function () { btn.disabled = false; });
   });
 })();
