@@ -84,7 +84,7 @@
 
   // ---- Submit
   // Images go to the Google Apps Script web app (saves to Drive). Paste its /exec URL here.
-  var UPLOAD_URL = '';
+  var UPLOAD_URL = 'https://script.google.com/macros/s/AKfycbwphn5424FThrtfXQW-UpITS4c8huCVg1MP0pT5oGQPwmV0wj8cs22TkV43s3Unb9FLFw/exec';
   var UPLOAD_TOKEN = 'begga-temple-scrolls';
   function send() {
     return fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) }).then(function (r) { return r.json(); });
