@@ -21,7 +21,7 @@
     var noun = set.querySelector('.work-rows').getAttribute('data-noun') || 'song';
     var Noun = noun.charAt(0).toUpperCase() + noun.slice(1);
     row.innerHTML = '<p class="kicker" style="margin:0">' + Noun + ' ' + n + '</p>' +
-      f('Title', 'Title', 'text', true) + f('Link', 'Link', 'url', true) +
+      f('Title', 'Title', 'text', true) + f(noun === 'song' ? 'Song link' : 'Link', noun === 'song' ? 'Song link' : 'Link', 'url', true) +
       '<div class="g2" style="gap:18px">' + f('Performed by', 'Performed by', 'text', true) + f('Produced by', 'Produced by', 'text', true) + '</div>' +
       f('Mixed and mastered by', 'Mixed and mastered by', 'text', false) +
       '<button type="button" class="link-mono remove-row">Remove this ' + noun + '</button>';
