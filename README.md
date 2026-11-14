@@ -22,7 +22,7 @@ Shared styles live in `assets/css/site.css`. Logos are in `assets/img/`.
 
 ## Still to do
 
-- **Contact form.** Get a free access key at web3forms.com using thabeggas@thabeggas.com, then replace `WEB3FORMS_ACCESS_KEY` in `contact/index.html`.
+- **Contact form.** Live through Web3Forms (key in `contact/index.html`), delivering to thabeggas@thabeggas.com.
 - **Member photos.** They load from the old Squarespace site's image server. Save them into `assets/img/members/` and update the paths before cancelling Squarespace, or they may disappear. I-Sci, Mega Soul and Bar-King have no photo yet.
 - **Cinematics order.** Videos are in the order they were sent. Confirm release dates.
 
