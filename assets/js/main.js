@@ -67,3 +67,25 @@
     });
   });
 })();
+
+// Click-to-play videos: open in an on-site lightbox instead of sending people to YouTube
+(function () {
+  var box = document.getElementById('yt-box');
+  if (!box || typeof box.showModal !== 'function') return;
+  var stage = box.querySelector('.yt-stage');
+  function close() { stage.innerHTML = ''; if (box.open) box.close(); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.yt[data-yt]');
+    if (!b) return;
+    e.preventDefault();
+    var id = b.getAttribute('data-yt');
+    box.classList.toggle('short', b.hasAttribute('data-short'));
+    stage.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) +
+      '?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="' + (b.getAttribute('aria-label') || 'Video').replace(/"/g, '&quot;') +
+      '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+    box.showModal();
+  });
+  box.querySelector('.yt-close').addEventListener('click', close);
+  box.addEventListener('click', function (e) { if (e.target === box) close(); });
+  box.addEventListener('close', function () { stage.innerHTML = ''; });
+})();
