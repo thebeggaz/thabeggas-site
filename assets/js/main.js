@@ -5,7 +5,7 @@
   if (!dlg || typeof dlg.showModal !== 'function') return;
   var seen = false;
   try { seen = localStorage.getItem(KEY) === '1'; } catch (e) { return; }
-  if (seen || location.pathname.indexOf('/contact/') !== -1) return;
+  if (seen || location.pathname.indexOf('/contact/') !== -1 || location.pathname.indexOf('/clan-page-request/') !== -1) return;
 
   function markSeen() { try { localStorage.setItem(KEY, '1'); } catch (e) {} }
   function open() {
