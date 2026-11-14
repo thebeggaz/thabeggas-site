@@ -9,6 +9,7 @@ The Tha Beggas website, hosted on GitHub Pages. Plain HTML and CSS, no build ste
 | `index.html` | Home |
 | `members/` | Members roster, with Crew / Producers / Team filter |
 | `members/father-lord/` | Father Lord's page |
+| `members/dragonfly/` | DragonFly's page |
 | `members/dragons-pitchfork/` | Member page template. Copy this folder for each new member page, then link the member's card in `members/index.html` |
 | `house-of-traps/` | The House of Traps, the Begga Kung Fu arcade |
 | `20-bags-of-gold/` | 20 Bags of Gold, collectibles. Checkout happens on Bonfire, which can't be embedded |

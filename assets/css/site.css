@@ -195,3 +195,7 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .gry-link { display: flex; align-items: center; gap: 16px; text-decoration: none; border: 3px solid var(--ink); background: var(--card); padding: 12px 16px; align-self: flex-start; }
 .gry-link img { width: 64px; height: auto; }
 .gry-link:hover { box-shadow: 6px 6px 0 var(--gold); color: var(--ink); }
+.coin-card { display: flex; align-items: center; gap: 20px; padding: 18px 20px; border: 3px solid var(--line-dark); text-decoration: none; color: var(--paper); }
+.coin-card img { width: 112px; height: 112px; flex: none; }
+.coin-card .coin-title { font-family: var(--display); font-size: 34px; line-height: 1.05; display: block; }
+.coin-card:hover { border-color: var(--gold); color: var(--paper); }
