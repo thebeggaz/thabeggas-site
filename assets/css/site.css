@@ -282,3 +282,4 @@ a.card:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--gold); }
 .price-card .price-note { margin: 10px 0 0; font-size: 15px; }
 .cost-box { border-color: var(--gold); box-shadow: 8px 8px 0 var(--gold); margin-right: 8px; }
 .cost-total { color: var(--gold-text); }
+@media (min-width: 961px) { .cine-grid > :last-child:nth-child(3n+1) { grid-column: 2; } }
