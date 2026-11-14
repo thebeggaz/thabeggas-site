@@ -17,7 +17,7 @@ Shared styles live in `assets/css/site.css`. Logos are in `assets/img/`.
 
 ## Still to do
 
-- **Mailing list.** The signup forms on Home and House of Traps have `action="#"`. Point them at a mailing list provider's form endpoint.
+- **Mailchimp.** The signup forms on Home and House of Traps use Mailchimp field names. Replace `MAILCHIMP_ACTION_URL` and `MAILCHIMP_HONEYPOT_NAME` with the values from the Mailchimp embedded form code (Audience > Signup forms > Embedded form). Replace the two `MAILCHIMP_TAG_ID_...` values with tag IDs so House of Traps signups are tagged separately, or delete those hidden inputs.
 - **Bracketed placeholders.** Portraits, cover art, product photos, member roles, bios and Chapter 2/3 titles are marked like `[Portrait]`. Search the repo for `[` to find them.
 - **The Alms Bowl products.** Each card links to the Bonfire store. Swap in product names, prices, photos and each product's own Bonfire link.
 - **Games.** Chapter 1 links to its current page on the GRYSKLL site. Games can move into a `house-of-traps/` subfolder here once they're ready.

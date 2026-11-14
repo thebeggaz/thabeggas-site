@@ -199,9 +199,11 @@
 <h2 id="list-h" class="h-m">Get word from The Temple</h2>
 <p>New music, new chapters in the House of Traps, and whatever comes out of the vault.</p>
 </div>
-<!-- TODO: point action at the mailing list provider's form endpoint -->
-<form class="signup" action="#" method="post">
-<div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+<!-- Mailchimp: replace MAILCHIMP_ACTION_URL with the form action from Audience > Signup forms > Embedded form -->
+<form class="signup" action="MAILCHIMP_ACTION_URL" method="post" target="_blank" novalidate>
+<div><label for="email">Email</label><input id="email" name="EMAIL" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+<div aria-hidden="true" style="position:absolute;left:-5000px"><input type="text" name="MAILCHIMP_HONEYPOT_NAME" tabindex="-1" value=""></div>
+<input type="hidden" name="tags" value="MAILCHIMP_TAG_ID_SITE">
 <button class="btn btn-ink" type="submit">Subscribe</button>
 </form>
 </div>
