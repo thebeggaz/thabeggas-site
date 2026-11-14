@@ -8,6 +8,7 @@ The Tha Beggas website, hosted on GitHub Pages. Plain HTML and CSS, no build ste
 | --- | --- |
 | `index.html` | Home |
 | `members/` | Members roster, with Crew / Producers / Team filter |
+| `members/father-lord/` | Father Lord's page |
 | `members/dragons-pitchfork/` | Member page template. Copy this folder for each new member page, then link the member's card in `members/index.html` |
 | `house-of-traps/` | The House of Traps, the Begga Kung Fu arcade |
 | `20-bags-of-gold/` | 20 Bags of Gold, collectibles. Checkout happens on Bonfire, which can't be embedded |
@@ -20,7 +21,7 @@ Shared styles live in `assets/css/site.css`. Logos are in `assets/img/`.
 ## Still to do
 
 - **Contact form.** Get a free access key at web3forms.com using thabeggas@thabeggas.com, then replace `WEB3FORMS_ACCESS_KEY` in `contact/index.html`.
-- **Father Lord page.** Waiting on the content from his page on the old site.
+- **Member photos.** They load from the old Squarespace site's image server. Save them into `assets/img/members/` and update the paths before cancelling Squarespace, or they may disappear. I-Sci, Mega Soul and Bar-King have no photo yet.
 - **Cinematics order.** Videos are in the order they were sent. Confirm release dates.
 
 - **Mailchimp.** The signup forms on Home and House of Traps use Mailchimp field names. Replace `MAILCHIMP_ACTION_URL` and `MAILCHIMP_HONEYPOT_NAME` with the values from the Mailchimp embedded form code (Audience > Signup forms > Embedded form). Replace the two `MAILCHIMP_TAG_ID_...` values with tag IDs so House of Traps signups are tagged separately, or delete those hidden inputs.
