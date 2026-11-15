@@ -110,3 +110,14 @@
   box.addEventListener('close', function () { stage.innerHTML = ''; });
   box.addEventListener('click', function (e) { if (e.target === box) close(); });
 })();
+
+// Site v2: sections rise in as they scroll into view
+(function () {
+  if (document.documentElement.getAttribute('data-v') !== '2' || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var els = [].slice.call(document.querySelectorAll('#main > section')).slice(1);
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  els.forEach(function (el) { el.classList.add('reveal'); io.observe(el); });
+})();
