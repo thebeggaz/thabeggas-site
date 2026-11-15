@@ -89,3 +89,24 @@
   box.addEventListener('click', function (e) { if (e.target === box) close(); });
   box.addEventListener('close', function () { stage.innerHTML = ''; });
 })();
+
+// House of Traps: play games in a window on the page (phones open the game's own page)
+(function () {
+  var box = document.getElementById('game-box');
+  if (!box || typeof box.showModal !== 'function') return;
+  var stage = box.querySelector('.game-stage'), full = box.querySelector('#game-full'), title = box.querySelector('#game-title');
+  function close() { stage.innerHTML = ''; if (box.open) box.close(); }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-game]');
+    if (!a || window.innerWidth < 900 || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    title.textContent = a.getAttribute('data-game');
+    full.href = a.href;
+    stage.innerHTML = '<iframe src="' + a.href + '" title="' + a.getAttribute('data-game').replace(/"/g, '&quot;') + '" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>';
+    box.showModal();
+    var f = stage.querySelector('iframe'); f.addEventListener('load', function () { try { f.contentWindow.focus(); } catch (x) {} f.focus(); });
+  });
+  box.querySelector('.game-close').addEventListener('click', close);
+  box.addEventListener('close', function () { stage.innerHTML = ''; });
+  box.addEventListener('click', function (e) { if (e.target === box) close(); });
+})();
